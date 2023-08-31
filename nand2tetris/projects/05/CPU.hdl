@@ -39,5 +39,6 @@ CHIP CPU {
         pc[15];          // address of next instruction
 
     PARTS:
-    // Put your code here:
+    Mux16(a= , b= in, sel = in[15], out= regAin);
+    Register(in = regAin, load = in[15], out=regAout);
 }

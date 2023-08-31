@@ -27,5 +27,13 @@ CHIP Memory {
     OUT out[16];
 
     PARTS:
-    // Put your code here:
+    Keyboard(out= kbOut);
+    Screen(in= in ,load= ,address = address[0..12],out= screenOut);
+
+    
+
+
+
+
+    
 }
