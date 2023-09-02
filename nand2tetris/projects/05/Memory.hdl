@@ -27,17 +27,14 @@ CHIP Memory {
     OUT out[16];
 
     PARTS:
-    RAM16K(in = in, load = toRamLoad, address = address[0..13], out=memOut);
+    RAM16K(in = in, load = toRam, address = address[0..13], out=memOut);
     Keyboard(out= kbOut);
-    Mux(a=address[14], b= false, sel = address[13], out= toScreen);
+    Screen(in= in ,load= toScreen,address = address[0..12],out= screenOut);
 
-    Or(a=toScreen, b=address[13], out=toNot);
-    Not(in=toNot, out = toRam);
+    DMux(in = load, sel address[14], a=toRam, b=toScreenOrKb);
+    Not(in=address[13], out = notKb);
+    And(a = toScreenOrKb, b=notKb, out= toScreen);
 
-    And(a=toScreen, b=load, out = toScreenLoad);
-    And(a=toRam, b=load, out = toRamLoad);
-
-    Screen(in= in ,load= toScreenLoad,address = address[0..12],out= screenOut);
     Mux16(a = screenOut, b = kbOut, sel = address[13], out=kbOrScreen);
     Mux16(a= memOut, b=kbOrScreen, sel = address[14], out= out);
     
