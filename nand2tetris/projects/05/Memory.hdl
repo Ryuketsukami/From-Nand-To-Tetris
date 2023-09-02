@@ -31,7 +31,7 @@ CHIP Memory {
     Keyboard(out= kbOut);
     Screen(in= in ,load= toScreen,address = address[0..12],out= screenOut);
 
-    DMux(in = load, sel address[14], a=toRam, b=toScreenOrKb);
+    DMux(in = load, sel = address[14], a=toRam, b=toScreenOrKb);
     Not(in=address[13], out = notKb);
     And(a = toScreenOrKb, b=notKb, out= toScreen);
 
