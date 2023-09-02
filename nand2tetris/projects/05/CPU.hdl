@@ -38,6 +38,11 @@ CHIP CPU {
         addressM[15],    // Address in data memory (of M)
         pc[15];          // address of next instruction
 
+
     PARTS:
-    // Put your code here:
+    Mux16(a= , b= in, sel = instruction[15], out= regAin);
+    Register(in = regAin, load = instruction[15], out=regAout);
+    
+
+    Mux16(a=)
 }
