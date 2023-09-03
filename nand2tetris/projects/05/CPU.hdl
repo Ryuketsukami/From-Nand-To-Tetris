@@ -41,8 +41,9 @@ CHIP CPU {
 
     PARTS:
     Mux16(b= ALUOut, a[0..14]= instruction[0..14], a[15] = false, sel = instruction[15], out= regAin);
-    Or(a=instruction[15], b=instruction[5], out=loadA);
-    ARegister(in = regAin, load = loadA, out=regAout);
+    Not(in = instruction[15], out=instA);
+    Or(a=instA, b=instruction[5], out=loadA);
+    ARegister(in = regAin, in[15] =false, load = loadA, out=regAout);
 
 
     Mux16(a=regAout, b=inM, sel= instruction[12], out=xALU);
@@ -54,7 +55,8 @@ CHIP CPU {
     And(a=instruction[0], b= posOut, out=firstAnd);
     And(a=instruction[1], b= zeroOut, out=secondAnd);
     And(a=instruction[2], b= negOut, out=thirdAnd);
-    Or8Way(in[0]=firstAnd, in[1]=secondAnd, in[2]=thirdAnd, out=jmpCheck);
+    Or8Way(in[0]=firstAnd, in[1]=secondAnd, in[2]=thirdAnd, out=beforeJmpCheck);
+    And(a=beforeJmpCheck, b=instruction[15], out =jmpCheck);
 
 
     And(a= instruction[4], b = instruction[15], out= loadD);
