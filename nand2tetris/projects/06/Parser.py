@@ -1,7 +1,10 @@
+
+
 def Parse(file_name):
     try:
         with open(file_name, 'r') as in_file:
-            lines = [element.strip() for element in in_file.readlines() if len(element.strip()) > 0]
+            lines = [element.split('/')[0].strip() for element in in_file.readlines() if len(element.split('/')[0].strip()) > 0]
+            lines = [line for line in lines if line[0] != '/']
             for i, line in enumerate(lines):
                 temp_dict = {}
                 temp_lst = []

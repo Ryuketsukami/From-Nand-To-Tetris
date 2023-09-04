@@ -60,14 +60,15 @@ JumpTable = {
 def ToCode(lst, st):
     ret_lst = []
     for line in lst:
-        value = 0
+        value = ''
         if line.get('addr', -1) != -1:
             addr = line.get('addr')
+            number = 0
             if addr in st:
-                value = st[addr]
+                number = st[addr]
             else:
-                value = addr
-            value = value[2:]
+                number = addr
+            value = bin(int(number))[2:]
             counter = 16 - len(value)
             for i in range(counter):
                 value = '0' + value

@@ -1,7 +1,7 @@
 
 
 class SymbolTable():
-    def __Init__(self):
+    def __init__(self):
         self.st = {
         'R0' : 0,
         'R1' : 1,
@@ -26,6 +26,7 @@ class SymbolTable():
         'ARG' : 2,
         'THIS' : 3,
         'THAT' : 4}
+        pass
 
     def Update(self, lst):
         counter = 0
@@ -45,9 +46,9 @@ class SymbolTable():
                         break
 
     def MakeSymbolTable(lst):
-        st = SymbolTable()
-        st.Update(lst)
-        return st
+        table = SymbolTable()
+        table.Update(lst)
+        return table
     
     def GetDict(self):
         return self.st
