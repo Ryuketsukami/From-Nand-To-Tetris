@@ -48,6 +48,9 @@ class SymbolTable():
         st = SymbolTable()
         st.Update(lst)
         return st
+    
+    def GetDict(self):
+        return self.st
 
 
 
