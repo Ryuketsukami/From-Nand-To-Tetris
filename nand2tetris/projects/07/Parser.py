@@ -2,14 +2,11 @@
 
 class Parser():
     def __init__(self, input_file_name : str):
-        try:
-            with open(input_file_name, "r") as in_file:
-                self.file = in_file
-                self.current_line = None
-                self.ari_table = ['add', 'sub', 'neg', 'eq', 'gt', 'lt', 'and', 'or', 'not']
-                self.next_line = self.file.readline()
-        except IOError("can't find the file"):
-            pass
+            self.file = open(input_file_name, "r")
+            self.current_line = None
+            self.ari_table = ['add', 'sub', 'neg', 'eq', 'gt', 'lt', 'and', 'or', 'not']
+            self.next_line = self.file.readline()
+
 
     #overwrites the next line, use with care
     def hasMoreCommands(self) -> bool:
@@ -23,7 +20,7 @@ class Parser():
         self.next_line = self.file.readline()
 
     def commandType(self):
-        cleaned = self.current_line.strip().split('/')[0].strip()
+        cleaned = self.current_line.strip().split('//')[0].strip()
         if cleaned in self.ari_table:
             return 'C_ARITHMETIC'
         elif 'pop' in cleaned and cleaned.index('pop') == 0:

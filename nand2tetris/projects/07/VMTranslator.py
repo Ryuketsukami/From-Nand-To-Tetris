@@ -12,7 +12,8 @@ def main():
     while (parse.hasMoreCommands()):
         parse.advance()
         cmd_type = parse.commandType()
-        
+        if cmd_type == None:
+            continue
         if cmd_type != 'C_RETURN':
             arg1 = parse.arg1()
         if cmd_type in ["C_PUSH", "C_POP", "C_FUNCTION", "C_CALL"]:
@@ -22,6 +23,6 @@ def main():
             cw.WriteArithmetic(arg1)
         elif cmd_type in ['C_PUSH', "C_POP"]:
             cw.WritePushPop(cmd_type, arg1, arg2)
-    pass
+    cw.Close()
 
 main()
