@@ -65,29 +65,40 @@ class CodeWriter():
             if segment == 'temp':
                 to_ret+= f'@{5+index}\nD=M\n'
             if segment == 'local':
-                to_ret+= f'@LCL\nD=M\n'
+                to_ret+= f'@{index}\nD=A\n@LCL\nA=D+M\nD=M\n'
             if segment == 'argument':
-                to_ret+= f'@ARG\nD=M\n'
+                to_ret+= f'@{index}\nD=A\n@ARG\nA=D+M\nD=M\n'
             if segment == 'this' or (segment == "pointer" and index == 0):
-                to_ret+= f'@THIS\nD=M\n'
+                to_ret+= f'@{index}\nD=A\n@THIS\nA=D+M\nD=M\n'
             if segment == 'that' or (segment == "pointer" and index == 1):
-                to_ret+= f'@THAT\nD=M\n'
+                to_ret+= f'@{index}\nD=A\n@THAT\nA=D+M\nD=M\n'
             if segment == 'constant':
                 to_ret+= f'@{index}\nD=A'
             if segment == 'static':
-                to_ret += f'@{self.static_name}.{index}\nD=M\n'
-            #pointer are missing
-
-                
+                to_ret += f'@{self.static_name}.{index}\nD=M\n'                
             to_ret += '@SP\nA=M\nM=D\n@SP\nM=M+1\n'#A points to sp
 
             
 
         if command == 'C_POP':
-            to_ret = '@SP\nA=M-1\n'#A points to y
+            if segment == 'temp':
+                to_ret+= f'@SP\nA=M-1\nD=M\n@{5+index}\nM=D\n'
+            if segment == 'local':
+                to_ret+= f'@{index}\nD=A\n@LCL\nD=D+M\n@R13\nM=D\n@SP\nA=M-1\nD=M\n@R13\nA=M\nM=D\n'
+            if segment == 'argument':
+                to_ret+= f'@{index}\nD=A\n@ARG\nD=D+M\n@R13\nM=D\n@SP\nA=M-1\nD=M\n@R13\nA=M\nM=D\n'
+            if segment == 'this' or (segment == "pointer" and index == 0):
+                to_ret+= f'@{index}\nD=A\n@THIS\nD=D+M\n@R13\nM=D\n@SP\nA=M-1\nD=M\n@R13\nA=M\nM=D\n'
+            if segment == 'that' or (segment == "pointer" and index == 1):
+                to_ret+= f'@{index}\nD=A\n@THAT\nD=D+M\n@R13\nM=D\n@SP\nA=M-1\nD=M\n@R13\nA=M\nM=D\n'
+            if segment == 'static':
+                to_ret += f'@SP\nA=M-1\nD=M\n@{self.static_name}.{index}\nM=D\n'
+                
+            to_ret += '@SP\nM=M-1\n'
 
 
-        self.file.write( +"\n")
+
+        self.file.write(to_ret)
 
     #close the output file
     def Close(self):
