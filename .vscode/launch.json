@@ -1,0 +1,21 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python: Debug my script",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/nand2tetris/projects/06/Assembler.py",
+            "args": [
+                
+                "Max.asm"  // Replace with your desired argument value
+              ],
+              "cwd": "${workspaceFolder}/nand2tetris/projects/06",
+              "console": "integratedTerminal"
+        }
+
+    ]
+}
