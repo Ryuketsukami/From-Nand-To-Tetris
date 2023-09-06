@@ -11,7 +11,7 @@ class CodeWriter():
             pass
 
     #Writes the command that writes the given code to the outputfile, given that the command is an arithmetic one
-    def writeArithmetic(self, command: str) -> None:
+    def WriteArithmetic(self, command: str) -> None:
 
         self.file.write( +"\n")
 
@@ -20,7 +20,7 @@ class CodeWriter():
         if command == 'C_PUSH':
 
         if command == 'C_POP':
-            
+
 
         self.file.write( +"\n")
 

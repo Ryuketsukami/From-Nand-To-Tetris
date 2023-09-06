@@ -5,18 +5,16 @@ class Parser():
         try:
             with open(input_file_name, "r") as in_file:
                 self.file = in_file
-                self.current_line = self.file.readline()
+                self.current_line = None
                 self.ari_table = ['add', 'sub', 'neg', 'eq', 'gt', 'lt', 'and', 'or', 'not']
-                if (self.current_line == ''):
-                    self.next_line = ''
-                else:
-                    self.next_line = self.file.readline()
+                self.next_line = self.file.readline()
         except IOError("can't find the file"):
             pass
 
     #overwrites the next line, use with care
     def hasMoreCommands(self) -> bool:
         if self.next_line == '':
+            self.file.close()
             return False
         return True
 
