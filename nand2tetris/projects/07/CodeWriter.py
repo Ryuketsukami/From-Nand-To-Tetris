@@ -64,6 +64,19 @@ class CodeWriter():
             to_ret =''
             if segment == 'temp':
                 to_ret+= f'@{5+index}\nD=M\n'
+            if segment == 'local':
+                to_ret+= f'@LCL\nD=M\n'
+            if segment == 'argument':
+                to_ret+= f'@ARG\nD=M\n'
+            if segment == 'this' or (segment == "pointer" and index == 0):
+                to_ret+= f'@THIS\nD=M\n'
+            if segment == 'that' or (segment == "pointer" and index == 1):
+                to_ret+= f'@THAT\nD=M\n'
+            if segment == 'constant':
+                to_ret+= f'@{index}\nD=A'
+            if segment == 'static':
+                to_ret += f'@{self.static_name}.{index}\nD=M\n'
+            #pointer are missing
 
                 
             to_ret += '@SP\nA=M\nM=D\n@SP\nM=M+1\n'#A points to sp
