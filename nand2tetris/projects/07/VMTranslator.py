@@ -26,7 +26,13 @@ def MakeDirList(dir_or_file : str):
     return ret_lst
 
 
-def DealWithFile(file_path : str, is_dir : bool):
+def FindOutputName(dir_lst):
+    if dir_lst[0] == 0:
+        return dir_lst[1][0][:-2] + 'asm'
+    else:
+        return dir_lst[1][0].split(os.sep)[-2] + '.asm'
+
+def DealWithFile(file_path : str, out_name : str):
 
     parse = Parser(file_path)
     cw = CodeWriter(file_path[:-2] + 'asm')
@@ -52,9 +58,12 @@ def DealWithFile(file_path : str, is_dir : bool):
 
 def main():
     dir_list = MakeDirList(sys.argv[1])
+    out_name = FindOutputName(dir_list)
 
-    for path in dir_list:
-        DealWithFile(path)
+    #bootstrap needs to be added here.
+
+    for path in dir_list[1]:
+        DealWithFile(path, out_name)
     pass
     
     

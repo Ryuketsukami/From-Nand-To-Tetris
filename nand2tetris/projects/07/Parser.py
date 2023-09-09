@@ -27,11 +27,16 @@ class Parser():
             return 'C_POP'
         elif 'push' in cleaned and cleaned.index('push') == 0:
             return 'C_PUSH'
-        #return 'C_LABEL'
-        #return 'C_GOTO'
-        #return 'C_IF'
-        #return 'C_FUNCTION'
-        #return 'C_CALL'
+        elif '(' in cleaned and ')' in cleaned and cleaned.index('(') == 0:
+            return 'C_LABEL'
+        elif 'goto' in cleaned and cleaned.index('goto') == 0:
+            return 'C_GOTO'
+        elif 'if-goto' in cleaned and cleaned.index('if-goto') == 0:
+            return 'C_IF'
+        elif 'function' in cleaned and cleaned.index('function') == 0:
+            return 'C_FUNCTION'
+        elif 'call' in cleaned and cleaned.index('call') == 0:
+            return 'C_CALL'
         return None
 
 
@@ -39,20 +44,16 @@ class Parser():
 
     def arg1(self):
         command = self.commandType()
-        if command == 'C_ARITHMETIC':
-            return self.current_line.strip().split('/')[0].strip()
-        elif command == 'C_POP' or command == 'C_PUSH':
-            return self.current_line.strip().split('/')[0].strip().split(' ')[1]
-        else:
+        if command == None:
             return
+        elif command == 'C_ARITHMETIC':
+            return self.current_line.strip().split('/')[0].strip()
+        else:
+            return self.current_line.strip().split('/')[0].strip().split(' ')[1]
 
     def arg2(self):
         command = self.commandType()
-        if command == 'C_POP' or command == 'C_PUSH':
+        if command == 'C_POP' or command == 'C_PUSH' or command == "C_FUNCTION" or command == "C_CALL":
             return self.current_line.strip().split('/')[0].strip().split(' ')[2]
-        elif command == 'C_FUNCTION':
-            return
-        elif command == 'C_CALL':
-            return
         else:
             return
