@@ -27,7 +27,7 @@ class Parser():
             return 'C_POP'
         elif 'push' in cleaned and cleaned.index('push') == 0:
             return 'C_PUSH'
-        elif '(' in cleaned and ')' in cleaned and cleaned.index('(') == 0:
+        elif 'label' in cleaned and cleaned.index('label') == 0:
             return 'C_LABEL'
         elif 'goto' in cleaned and cleaned.index('goto') == 0:
             return 'C_GOTO'

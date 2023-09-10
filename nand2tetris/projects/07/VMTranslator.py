@@ -30,12 +30,11 @@ def FindOutputName(dir_lst):
     if dir_lst[0] == 0:
         return dir_lst[1][0][:-2] + 'asm'
     else:
-        return dir_lst[1][0].split(os.sep)[-2] + '.asm'
+        return dir_lst[1][0].split(os.sep)[:-1].join(os.sep) + '.asm'
 
-def DealWithFile(file_path : str, out_name : str):
+def DealWithFile(file_path : str, cw):
 
     parse = Parser(file_path)
-    cw = CodeWriter(file_path[:-2] + 'asm')
     arg1 = None
     arg2 = None
     while (parse.hasMoreCommands()):
@@ -60,10 +59,11 @@ def main():
     dir_list = MakeDirList(sys.argv[1])
     out_name = FindOutputName(dir_list)
 
+    cw = CodeWriter(out_name) #dir_list[1][i] when i =0 has the first path+filename.asm
     #bootstrap needs to be added here.
 
     for path in dir_list[1]:
-        DealWithFile(path, out_name)
+        DealWithFile(path, cw)
     pass
     
     
