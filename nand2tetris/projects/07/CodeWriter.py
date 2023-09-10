@@ -115,7 +115,7 @@ class CodeWriter():
 
     def writeInit(self) -> None:
         self.file.write('@256\nD=A\n@SP\nM=D\n')
-        self.writeCall('Sys.Sys.init', 0)
+        self.writeCall('Sys.init', 0)
         
 
 
@@ -139,7 +139,9 @@ class CodeWriter():
 
 
     def writeCall(self, functionName: str, numArgs : int)->None:
-        self.file.write(f'@{self.static_name}{functionName}$ret.{self.id}\nD=A\n@SP\nA=M\nM=D\n@SP\nM=M+1\n') #push the ret address
+        curr_id = self.id
+        self.id+=1
+        self.file.write(f'@{self.static_name}{functionName}$ret.{curr_id}\nD=A\n@SP\nA=M\nM=D\n@SP\nM=M+1\n') #push the ret address
         self.file.write(f'@LCL\nD=M\n@SP\nA=M\nM=D\n@SP\nM=M+1\n') #push the LCL address
         self.file.write(f'@ARG\nD=M\n@SP\nA=M\nM=D\n@SP\nM=M+1\n')
         self.file.write(f'@THIS\nD=M\n@SP\nA=M\nM=D\n@SP\nM=M+1\n')
@@ -147,6 +149,7 @@ class CodeWriter():
         self.file.write(f'@{5+numArgs}\nD=A\n@SP\nD=M-D\n@ARG\nM=D\n') #arg = newarg
         self.file.write(f'@SP\nD=M\n@LCL\nM=D\n') #lcl is new lcl
         self.writeGoto(f'{self.static_name}{functionName}')
+        self.file.write(f'({self.static_name}{functionName}$ret.{curr_id})\n')
 
 
     def writeReturn(self)->None:
