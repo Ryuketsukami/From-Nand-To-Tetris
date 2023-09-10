@@ -33,10 +33,11 @@ def FindOutputName(dir_lst):
         return dir_lst[1][0].split(os.sep)[:-1].join(os.sep) + '.asm'
 
 def DealWithFile(file_path : str, cw):
-
     parse = Parser(file_path)
+    file_name = file_path.split('\\')[-1][:-3]
     arg1 = None
     arg2 = None
+    func_stack = []
     while (parse.hasMoreCommands()):
         parse.advance()
         cmd_type = parse.commandType()
@@ -46,12 +47,29 @@ def DealWithFile(file_path : str, cw):
             arg1 = parse.arg1()
         if cmd_type in ["C_PUSH", "C_POP", "C_FUNCTION", "C_CALL"]:
             arg2 = parse.arg2()
-        
+        label = arg1
         if cmd_type == 'C_ARITHMETIC':
             cw.WriteArithmetic(arg1)
         elif cmd_type in ['C_PUSH', "C_POP"]:
             cw.WritePushPop(cmd_type, arg1, arg2)
-    cw.Close()
+        elif cmd_type == "C_GOTO":
+            if len(func_stack)>0:
+                label = f'{file_name}{func_stack[-1]}${label}'
+            cw.writeGoto(label)
+        elif cmd_type == 'C_FUNCTION':
+            func_stack.append(label)
+            cw.writeFunction(arg1, arg2)
+        elif cmd_type == 'C_IF':
+            if len(func_stack)>0:
+                label = f'{file_name}{func_stack[-1]}${label}'
+            cw.writeIf(label)
+        elif cmd_type == 'C_RETURN':
+            cw.writeReturn()
+            func_stack.pop()
+        elif cmd_type == 'C_CALL':
+            cw.writeCall(arg1, arg2)
+
+
 
 
 
@@ -60,11 +78,10 @@ def main():
     out_name = FindOutputName(dir_list)
 
     cw = CodeWriter(out_name) #dir_list[1][i] when i =0 has the first path+filename.asm
-    #bootstrap needs to be added here.
-
+    cw.writeInit()
     for path in dir_list[1]:
         DealWithFile(path, cw)
-    pass
+    cw.Close()
     
     
 main()

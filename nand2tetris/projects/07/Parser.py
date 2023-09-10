@@ -37,6 +37,8 @@ class Parser():
             return 'C_FUNCTION'
         elif 'call' in cleaned and cleaned.index('call') == 0:
             return 'C_CALL'
+        elif 'return' in cleaned and cleaned.index('return') == 0:
+            return 'C_RETURN'
         return None
 
 
