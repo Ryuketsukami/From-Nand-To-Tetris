@@ -30,11 +30,11 @@ def FindOutputName(dir_lst):
     if dir_lst[0] == 0:
         return dir_lst[1][0][:-2] + 'asm'
     else:
-        return dir_lst[1][0].split(os.sep)[:-1].join(os.sep) + '.asm'
+        return os.sep.join(dir_lst[1][0].split(os.sep)[:-1]) + '.asm'
 
 def DealWithFile(file_path : str, cw):
     parse = Parser(file_path)
-    file_name = file_path.split('\\')[-1][:-3]
+    file_name = cw.getFileName()
     arg1 = None
     arg2 = None
     func_stack = []
@@ -54,23 +54,24 @@ def DealWithFile(file_path : str, cw):
             cw.WritePushPop(cmd_type, arg1, arg2)
         elif cmd_type == "C_GOTO":
             if len(func_stack)>0:
-                label = f'{file_name}{func_stack[-1]}${label}'
+                label = f'{func_stack[-1]}${label}'
             cw.writeGoto(label)
         elif cmd_type == 'C_FUNCTION':
             func_stack.append(label)
             cw.writeFunction(arg1, arg2)
         elif cmd_type == 'C_IF':
             if len(func_stack)>0:
-                label = f'{file_name}{func_stack[-1]}${label}'
+                label = f'{func_stack[-1]}${label}'
             cw.writeIf(label)
         elif cmd_type == 'C_RETURN':
             cw.writeReturn()
-            func_stack.pop()
+            if len(func_stack) > 0:
+                func_stack.pop()
         elif cmd_type == 'C_CALL':
             cw.writeCall(arg1, arg2)
         elif cmd_type == 'C_LABEL':
             if len(func_stack)>0:
-                label = f'{file_name}{func_stack[-1]}${label}'
+                label = f'{func_stack[-1]}${label}'
             cw.writeLabel(label)
 
 
@@ -82,8 +83,10 @@ def main():
     out_name = FindOutputName(dir_list)
 
     cw = CodeWriter(out_name) #dir_list[1][i] when i =0 has the first path+filename.asm
-    #cw.writeInit()
+    cw.setFileName('Sys.vm')
+    cw.writeInit()
     for path in dir_list[1]:
+        cw.setFileName(path)
         DealWithFile(path, cw)
     cw.Close()
     

@@ -4,7 +4,7 @@ class CodeWriter():
 
     def __init__(self, output_file_name : str) -> None:
             self.file = open(output_file_name, "w")
-            self.static_name = output_file_name.split('\\')[-1][:-3] #static_name has a '.' at the end
+            self.static_name = output_file_name.split('\\')[-1][:-4] #static_name has a '.' at the end
             self.id = 0
 
 
@@ -77,7 +77,7 @@ class CodeWriter():
             if segment == 'constant':
                 to_ret+= f'@{index}\nD=A\n'
             if segment == 'static':
-                to_ret += f'@{self.static_name}{index}\nD=M\n'                
+                to_ret += f'@{self.static_name}.{index}\nD=M\n'                
             to_ret += '@SP\nA=M\nM=D\n@SP\nM=M+1\n'#A points to sp
 
         if command == 'C_POP':
@@ -96,7 +96,7 @@ class CodeWriter():
             if segment == 'pointer' and index == '1':
                 to_ret += '@SP\nA=M-1\nD=M\n@THAT\nM=D\n'
             if segment == 'static':
-                to_ret += f'@SP\nA=M-1\nD=M\n@{self.static_name}{index}\nM=D\n' 
+                to_ret += f'@SP\nA=M-1\nD=M\n@{self.static_name}.{index}\nM=D\n' 
             to_ret += '@SP\nM=M-1\n'
 
         self.file.write(to_ret)
@@ -111,6 +111,10 @@ class CodeWriter():
     #informs codewriter that there is a new file
     def setFileName(self, fileName : str) -> None:
         self.static_name = fileName.split('\\')[-1][:-3]
+
+
+    def getFileName(self):
+        return self.static_name
 
 
     def writeInit(self) -> None:
@@ -133,8 +137,8 @@ class CodeWriter():
 
 
     def writeFunction(self, functionName : str, numVars : int)->None:
-        self.file.write(f'({self.static_name}{functionName})\n')
-        for num in range(numVars):
+        self.file.write(f'({functionName})\n')
+        for num in range(int(numVars)):
             self.WritePushPop("C_PUSH", 'constant', 0)
         self.writeReturn()
 
@@ -142,22 +146,23 @@ class CodeWriter():
     def writeCall(self, functionName: str, numArgs : int)->None:
         curr_id = self.id
         self.id+=1
-        self.file.write(f'@{self.static_name}{functionName}$ret.{curr_id}\nD=A\n@SP\nA=M\nM=D\n@SP\nM=M+1\n') #push the ret address
+        self.file.write(f'@{functionName}$ret.{curr_id}\nD=A\n@SP\nA=M\nM=D\n@SP\nM=M+1\n') #push the ret address
         self.file.write(f'@LCL\nD=M\n@SP\nA=M\nM=D\n@SP\nM=M+1\n') #push the LCL address
         self.file.write(f'@ARG\nD=M\n@SP\nA=M\nM=D\n@SP\nM=M+1\n')
         self.file.write(f'@THIS\nD=M\n@SP\nA=M\nM=D\n@SP\nM=M+1\n')
         self.file.write(f'@THAT\nD=M\n@SP\nA=M\nM=D\n@SP\nM=M+1\n')
-        self.file.write(f'@{5+numArgs}\nD=A\n@SP\nD=M-D\n@ARG\nM=D\n') #arg = newarg
+        self.file.write(f'@{5+int(numArgs)}\nD=A\n@SP\nD=M-D\n@ARG\nM=D\n') #arg = newarg
         self.file.write(f'@SP\nD=M\n@LCL\nM=D\n') #lcl is new lcl
-        self.writeGoto(f'{self.static_name}{functionName}')
-        self.file.write(f'({self.static_name}{functionName}$ret.{curr_id})\n')
+        self.writeGoto(f'{functionName}')
+        self.file.write(f'({functionName}$ret.{curr_id})\n')
 
 
     def writeReturn(self)->None:
+        self.file.write('@5\nD=A\n@LCL\nA=M-D\nD=M\n@R13\nM=D\n') #save the return addr in R13
         self.WritePushPop('C_POP', 'argument', 0) #put the return value into arg 0
         self.file.write('@LCL\nD=M\n@SP\nM=D\n') #SP is now at LCL
-        self.WritePushPop('C_POP', 'pointer', 1)
-        self.WritePushPop('C_POP', 'pointer', 0)
+        self.WritePushPop('C_POP', 'pointer', 1) #pop that
+        self.WritePushPop('C_POP', 'pointer', 0) #pop this
         self.WritePushPop('C_POP', 'temp', 0) #temp 0 contains the address that arg has to get
         
         self.file.write('@SP\nM=M-1\nA=M\nD=M\n') #D has what LCL has to get AND SP = sp-1
@@ -167,5 +172,5 @@ class CodeWriter():
         self.file.write('@ARG\nD=M\n@SP\nM=D+1\n') #SP is now at the right spot
 
         self.file.write(f'@{5}\nD=M\n@ARG\nM=D\n') #arg is at the right spot
-        self.file.write(f'@{6}\nA=M\n0;JMP\n') #we jamp to the ret addr pay attention if ret add is after the tag
+        self.file.write(f'@R13\nA=M\n0;JMP\n') #we jamp to the ret addr pay attention if ret add is after the tag-----------------------important or A=M+1
 
