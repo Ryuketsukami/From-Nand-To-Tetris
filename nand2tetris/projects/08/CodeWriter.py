@@ -140,10 +140,10 @@ class CodeWriter():
         self.file.write(f'({functionName})\n')
         for num in range(int(numVars)):
             self.WritePushPop("C_PUSH", 'constant', 0)
-        self.writeReturn()
+        
 
 
-    def writeCall(self, functionName: str, numArgs : int)->None:
+    def writeCall(self, functionName: str, numArgs : int)->None: #this might need some fixing
         curr_id = self.id
         self.id+=1
         self.file.write(f'@{functionName}$ret.{curr_id}\nD=A\n@SP\nA=M\nM=D\n@SP\nM=M+1\n') #push the ret address
@@ -168,9 +168,9 @@ class CodeWriter():
         self.file.write('@SP\nM=M-1\nA=M\nD=M\n') #D has what LCL has to get AND SP = sp-1
         self.file.write('@LCL\nM=D\n') #LCL has old adress
 
-        self.WritePushPop('C_POP', 'temp', 1) #temp 1 contains the ret address
         self.file.write('@ARG\nD=M\n@SP\nM=D+1\n') #SP is now at the right spot
 
         self.file.write(f'@{5}\nD=M\n@ARG\nM=D\n') #arg is at the right spot
         self.file.write(f'@R13\nA=M\n0;JMP\n') #we jamp to the ret addr pay attention if ret add is after the tag-----------------------important or A=M+1
+
 
