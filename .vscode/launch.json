@@ -1,0 +1,17 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python: Debug my script",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/nand2tetris/projects/07/VMTranslator.py",
+            "args": [
+                "C:\Users\ryuke\OneDrive\Desktop\Tetris\nand2tetris\projects\07\MemoryAccess\PointerTest\PointerTest.vm"  // Replace with your desired argument value
+              ],
+              "cwd": "${workspaceFolder}/nand2tetris/projects/07",
+              "console": "integratedTerminal"
+        }
+
+    ]
+}

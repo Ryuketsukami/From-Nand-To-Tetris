@@ -40,9 +40,36 @@ CHIP CPU {
 
 
     PARTS:
-    Mux16(a= , b= in, sel = instruction[15], out= regAin);
-    Register(in = regAin, load = instruction[15], out=regAout);
+    Mux16(b= ALUOut, a[0..14]= instruction[0..14], a[15] = false, sel = instruction[15], out= regAin);
+    Not(in = instruction[15], out=instA);
+    Or(a=instA, b=instruction[5], out=loadA);
+    ARegister(in = regAin, in[15] =false, load = loadA, out=regAout);
+
+
+    Mux16(a=regAout, b=inM, sel= instruction[12], out=xALU);
+    ALU(y= regDout, x=xALU, no = instruction[6], f = instruction[7], nx = instruction[8], zx = instruction[9], ny = instruction[10], zy = instruction[11], out=ALUOut, zr = zeroOut, ng = negOut);
+    Or(a=zeroOut, b=negOut, out = beforeNot);
+    Not(in = beforeNot, out=posOut);
+
+
+    And(a=instruction[0], b= posOut, out=firstAnd);
+    And(a=instruction[1], b= zeroOut, out=secondAnd);
+    And(a=instruction[2], b= negOut, out=thirdAnd);
+    Or8Way(in[0]=firstAnd, in[1]=secondAnd, in[2]=thirdAnd, out=beforeJmpCheck);
+    And(a=beforeJmpCheck, b=instruction[15], out =jmpCheck);
+
+
+    And(a= instruction[4], b = instruction[15], out= loadD);
+
+    DRegister(in = ALUOut, load = loadD, out = regDout);
     
 
-    Mux16(a=)
+
+    And(a = instruction[3], b= instruction[15], out = writeM);
+    And16(a=ALUOut, b=true, out=outM);
+    And16(a=regAout, b=true, out[0..14]=addressM);
+    PC(inc= true, load=jmpCheck, reset=reset, in=regAout, out[0..14]=pc);
+
+
+
 }
