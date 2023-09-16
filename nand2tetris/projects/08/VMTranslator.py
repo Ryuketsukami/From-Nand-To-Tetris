@@ -34,10 +34,9 @@ def FindOutputName(dir_lst):
 
 def DealWithFile(file_path : str, cw):
     parse = Parser(file_path)
-    file_name = cw.getFileName()
     arg1 = None
     arg2 = None
-    func_stack = []
+    func_stack = ''
     while (parse.hasMoreCommands()):
         parse.advance()
         cmd_type = parse.commandType()
@@ -54,24 +53,22 @@ def DealWithFile(file_path : str, cw):
             cw.WritePushPop(cmd_type, arg1, arg2)
         elif cmd_type == "C_GOTO":
             if len(func_stack)>0:
-                label = f'{func_stack[-1]}${label}'
+                label = f'{func_stack}${label}'
             cw.writeGoto(label)
         elif cmd_type == 'C_FUNCTION':
-            func_stack.append(label)
+            func_stack = label
             cw.writeFunction(arg1, arg2)
         elif cmd_type == 'C_IF':
             if len(func_stack)>0:
-                label = f'{func_stack[-1]}${label}'
+                label = f'{func_stack}${label}'
             cw.writeIf(label)
         elif cmd_type == 'C_RETURN':
             cw.writeReturn()
-            if len(func_stack) > 0:
-                func_stack.pop()
         elif cmd_type == 'C_CALL':
             cw.writeCall(arg1, arg2)
         elif cmd_type == 'C_LABEL':
             if len(func_stack)>0:
-                label = f'{func_stack[-1]}${label}'
+                label = f'{func_stack}${label}'
             cw.writeLabel(label)
 
 
